@@ -1,24 +1,41 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
+import jwt_decode from 'jwt-decode'
 
 const Invest = () => {
     // Define ranks and their requirements
-    const [balance, setbalance] = useState()
-    const location = useLocation()
-    const {decodedToken} = location.state;
+    const [isLoading, setIsLoading] = useState(true);
+    const [decodedToken, setDecodedToken] = useState(null);
+    const [username, setUsername] = useState('');
+    const [balance, setBalance] = useState('');
     const navigate = useNavigate();
-    const [username, setusername] = useState()
-
+    const location = useLocation();
 
     useEffect(() => {
-        const getDeets = () => {
-            const { decodedToken } = location.state;
-            setusername(decodedToken.username)
-            setbalance(decodedToken.balance)
-        }
-        getDeets();
-    }, [])
+        const getToken = () => {
+            const token = localStorage.getItem('token');
+            setDecodedToken(token ? jwt_decode(token) : null);
+        };
+
+        const getDetails = () => {
+            if (decodedToken) {
+                setUsername(decodedToken.username);
+                setBalance(decodedToken.balance);
+            }
+            setIsLoading(false);
+        };
+
+        getToken();
+        setTimeout(() => {
+            getDetails();
+        }, 3000);
+    }, [decodedToken]);
+
+    if (isLoading) {
+        return <div>Loading...</div>; // You can replace this with your preferred loading indicator
+    }
+
 
     return (
         <div>
@@ -33,7 +50,7 @@ const Invest = () => {
                             <p className="text-l font-bold text-white">Account Balance:</p>
                             <p className="font-bold text-white">$ {balance}</p>
                         </div>
-                        <div className="flex flex-col items-start">
+                        <div className="flex flex-col items-center lg:flex-row lg:flex-wrap md:justify-center">
                             <p className="text-xl font-bold text-white mt-5 ">Choose A Plan</p>
                             <div onClick={() => {
                                             navigate('/pay', { state: { payment: "0.01", plan: "VIP1", user: username } });

@@ -12,23 +12,27 @@ import Invest from './components/Invest'
 import Dashboard from './pages/Dashboard'
 import Pay from './components/Pay'
 import Profile from './components/Profile'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <AppProvider>
-      <Router>
-        <Routes>
-          <Route path='/' element={<Login/>}/>
-          <Route path='/register' element={<Register/>}/>
-          <Route path='/home' element={<Home/>}/>
-          <Route path='/invest' element={<Invest/>}/>
-          <Route path='/dashboard' element={<Dashboard/>}/>
-          <Route path='/pay' element={<Pay/>}/>
-          <Route path='/profile' element={<Profile/>}/>
-        </Routes>
-      </Router>
+      <GoogleOAuthProvider clientId='248395402149-5nhchesuceesvh81lfejdtuljrhdciid.apps.googleusercontent.com'>
+        <Router>
+          <Routes>
+            <Route path='/' element={<Login/>}/>
+            <Route path='/register' element={<Register/>}/>
+            <Route path='/home' element={<Home/>}/>
+            <Route path='/invest' element={<Invest/>}/>
+            <Route path='/dashboard' element={<Dashboard/>}/>
+            <Route path='/pay' element={<Pay/>}/>
+            <Route path='/profile' element={<Profile/>}/>
+          </Routes>
+        </Router>
+      </GoogleOAuthProvider>
+
     </AppProvider>
     
   )

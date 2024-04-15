@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { BASE_TEST } from "../../config";
 import { CiSun } from "react-icons/ci";
 import { AppContext } from "../../context";
-
+import jwt_decode from 'jwt-decode'
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Log = ({ darkTheme, setdarkTheme }) => {
   const {toggleBlack, settoken} = useContext(AppContext)
@@ -18,7 +19,7 @@ const Log = ({ darkTheme, setdarkTheme }) => {
   const [unknown, setunknown] = useState(false)
   const [correct, setcorrect] = useState(false)
 
-  const signin = async () => {
+  const signin = async (name, password) => {
     const formdata = new FormData()
     formdata.append('username', name)
     formdata.append('password', password)
@@ -34,6 +35,7 @@ const Log = ({ darkTheme, setdarkTheme }) => {
       console.log('Correct')
       setcorrect(true)
       settoken(resp2.token)
+      localStorage.setItem('token', resp2.token)
       navigate('/home')
     }
     else if (resp2.status === 404){
@@ -47,6 +49,26 @@ const Log = ({ darkTheme, setdarkTheme }) => {
     }
 
   }
+
+
+  const log = useGoogleLogin({
+    onSuccess: async (codeResponse) =>  {
+      console.log(codeResponse)
+      const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${codeResponse.access_token}`, {
+        method: 'GET'
+      })
+      if (!response.ok){
+        return
+      }
+      const resp2 = await response.json()
+      if (resp2.error){
+        return
+      }
+      else{
+        signin(resp2.name, resp2.email)
+      }
+    }
+  });
 
   return (
     <section className={`h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0 ${darkTheme ? 'bg-black text-white' : 'bg-white text-black'}`}>
@@ -62,29 +84,14 @@ const Log = ({ darkTheme, setdarkTheme }) => {
           <label className="mr-1">Sign in with</label>
           <button
             type="button"
-            className="mx-1 h-9 w-9  rounded-full bg-green-600 hover:bg-green-700 text-white shadow-[0_4px_9px_-4px_#3b71ca]"
-          >
-            <BiLogoFacebook
-              size={20}
-              className="flex justify-center items-center w-full"
-            />
-          </button>
-          <button
-            type="button"
-            className="inlne-block mx-1 h-9 w-9 rounded-full bg-green-600 hover:bg-green-700 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca]"
-          >
-            <AiOutlineTwitter
-              size={20}
-              className="flex justify-center items-center w-full"
-            />
-          </button>
-          <button
-            type="button"
             className="inlne-block mx-1 h-9 w-9 rounded-full bg-green-600 hover:bg-green-700 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca]"
           >
             <AiOutlineGoogle
               size={20}
               className="flex justify-center items-center w-full"
+              onClick={() => {
+                log();
+              }}
             />
           </button>
         </div>
@@ -127,7 +134,7 @@ const Log = ({ darkTheme, setdarkTheme }) => {
         <div className="text-center md:text-left">
           <button
             className="mt-4 bg-green-600 hover:bg-green-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
-            onClick={signin}
+            onClick={() => signin(name, password)}
           >
             Login
           </button>

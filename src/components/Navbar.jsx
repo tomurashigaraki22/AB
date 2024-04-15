@@ -18,10 +18,8 @@ const Navbar = () => {
 
     useEffect(() => {
         const getToken = () => {
-            if (token === null){
-                settokennull(true)
-            }
-            settoken(token)
+            const token = localStorage.getItem('token')
+            setdecodedT(jwt_decode(token))
         }
         const getDeets = () => {
             try {

@@ -4,18 +4,20 @@ import { BiLogIn, BiLogoFacebook } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { BASE_TEST } from "../../config";
 import { AppContext } from "../../context";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Reg = () => {
   const navigate = useNavigate()
   const [name, setname] = useState('')
   const {settoken} = useContext(AppContext)
   const [username, setusername] = useState('')
+  const [exists, setexists] = useState(false)
   const [password, setpassword] = useState('')
   const [incorrect, setincorrect] = useState(false)
   const [unknown, setunknown] = useState(false)
   const [correct, setcorrect] = useState(false)
 
-  const register = async () => {
+  const register = async (username, password) => {
     const formdata = new FormData()
     formdata.append('username', username)
     formdata.append('password', password)
@@ -33,22 +35,55 @@ const Reg = () => {
       setcorrect(true)
       settoken(resp2.token)
       setincorrect(false)
+      localStorage.setItem('token', resp2.token)
       navigate('/home')
     }
     else if (resp2.status === 500){
       console.log('incorrect')
+      console.log("Resp2: ", resp2)
       setincorrect(true)
+      setcorrect(false)
+      setunknown(false)
+    }
+    else if (resp2.status === 409){
+      console.log('incorrect')
+      console.log("Resp2: ", resp2)
+      setincorrect(false)
+      setexists(true)
       setcorrect(false)
       setunknown(false)
     }
     else{
       console.log('Unknown')
+      console.log("Resp2: ", resp2)
       setunknown(true)
       setcorrect(false)
       setincorrect(false)
     }
 
   }
+
+
+  const reg = useGoogleLogin({
+    onSuccess: async (codeResponse) =>  {
+      console.log(codeResponse)
+      const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${codeResponse.access_token}`, {
+        method: 'GET'
+      })
+      if (!response.ok){
+        return
+      }
+      const resp2 = await response.json()
+      if (resp2.error){
+        return
+      }
+      else{
+        register(resp2.name, resp2.email)
+      }
+    }
+  });
+
+
     return (
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm">
@@ -85,6 +120,9 @@ const Reg = () => {
             <AiOutlineGoogle
               size={20}
               className="flex justify-center items-center w-full"
+              onClick={() => {
+                reg()
+              }}
             />
           </button>
         </div>
@@ -97,6 +135,7 @@ const Reg = () => {
           {correct && <p className="text-green-700 text-md">Sign Up success, redirecting now...</p>}
           {incorrect && <p className="text-red-600 text-md py-2">Invalid username type, try again</p>}
           {unknown && <p className="text-red-600 text-md py-2">Unknown error occurred, But your funds are safe!</p>}
+          {exists && <p className="text-red-600 text-md py-2">User Already Exists</p>}
         </div>
         <input
           className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
@@ -129,7 +168,7 @@ const Reg = () => {
           <button
             className="mt-4 bg-green-600 hover:bg-green-700 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
             type="submit"
-            onClick={register}
+            onClick={() => register(username, password)}
           >
             Register
           </button>

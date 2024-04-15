@@ -9,47 +9,51 @@ import { useNavigate } from "react-router-dom";
 
 
 const Home = () => {
-    const [tokennull, settokennull] = useState(false)
-    const {token} = useContext(AppContext)
-    const [decodedT, setdecodedT] = useState(null)
-    const navigate = useNavigate()
-
-    const [tokens, settoken] = useState()
-    const [username, setusername] = useState()
-    const [tier, settier] = useState('')
-    const [balance, setbalance] = useState('')
-
+    const [isLoading, setIsLoading] = useState(true);
+    const [username, setUsername] = useState('');
+    const [tier, setTier] = useState('');
+    const [balance, setBalance] = useState('');
+    const navigate = useNavigate();
+    const { token } = useContext(AppContext);
+    const decodedTokenFromContext = token ? jwt_decode(token) : null;
+    const [screenSize, setScreenSize] = useState('');
 
     useEffect(() => {
-        const getToken = () => {
-            if (token === null){
-                settokennull(true)
+        const handleResize = () => {
+        const width = window.innerWidth;
+        setScreenSize(width >= 1024 ? 'lg' : 'sm'); // Set screen size based on width
+        };
+
+        // Call handleResize initially and add event listener for resize
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup event listener on component unmount
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            let decodedToken = decodedTokenFromContext;
+            if (!decodedToken && localStorage.getItem('token')) {
+                decodedToken = jwt_decode(localStorage.getItem('token'));
             }
-            settoken(token)
-        }
-        const getDeets = () => {
-            try {
-                console.log(tokens)
-                const decoded = jwt_decode(token)
-                const username = decoded.username
-                setdecodedT(decoded)
-                console.log(decoded)
-                settier(decoded.rank)
-                setbalance(decoded.balance)
-                setusername(username)
-            } catch (error) {
-                console.error(error)
+
+            if (decodedToken) {
+                setUsername(decodedToken.username);
+                setBalance(decodedToken.balance);
+                setTier(decodedToken.rank);
             }
             
-        }
-        getToken();
-        if (tokennull){
-            return
-        }
-        else{
-            getDeets();
-        }
-    }, [])
+            setIsLoading(false);
+        };
+
+        fetchData();
+    }, [decodedTokenFromContext]);
+
+    if (isLoading) {
+        return <div>Loading...</div>; // You can replace this with your preferred loading indicator
+    }
 
 
     return(
@@ -67,11 +71,14 @@ const Home = () => {
                 <p className="text-xl font-bold text-white">Account Balance: $ {balance}</p>
                 <p className="text-sm text-white font-bold">Available Withdrawal Balance: ${balance}</p>
             </div>
-            <div className="mt-[50px] mb-[50px]">
-                <div>
-                    <MiniChart widgetProps={{"theme": "dark", "height": "200px", "symbol": "BTC",}}/>
-                </div>
+            <div className="mt-5 mb-5 lg:mb-0">
+                {screenSize === 'lg' ? (
+                    <AdvancedChart widgetProps={{ "theme": "dark", "height": "400px", "symbol": "BTC" }} />
+                ) : (
+                    <MiniChart widgetProps={{ "theme": "dark", "height": "200px", "symbol": "BTC" }} />
+                )}
             </div>
+
             <div>
                 {tier === "FREE" ? (
                     <>
@@ -81,7 +88,7 @@ const Home = () => {
                         <div className="border border-gray-600 p-8 flex flex-col items-center space-y-10 rounded-lg mt-10">
                             <p>You currently have no active investments at the moment</p>
                             <div onClick={() => {
-                                navigate('/invest', {state: {decodedToken: decodedT}})
+                                navigate('/invest')
                             }} className="border-2 cursor-pointer border-green-500 bg-green-500 rounded-md px-3 py-2 w-[50%] hover:bg-black hover:border-black">
                                 <p className="text-l font-bold text-white">Invest Now</p>
                             </div>
