@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [username, setUsername] = useState('');
+    const [availablebal, setavailablebal] = useState(false)
     const [tier, setTier] = useState('');
     const [balance, setBalance] = useState('');
     const navigate = useNavigate();
@@ -63,13 +64,18 @@ const Home = () => {
                 <p className="text-black text-2xl font-bold">Hello,</p>
                 <p className="text-gray-400 text-2xl font-bold pt-[0.2%]">{username}</p>
             </div>
+            {availablebal && <p className="mt-5 font-bold text-red-600">Current Available Balance is too Low for withdrawal</p>}
             <div className="flex flex-col items-start mt-5 space-y-2 border border-green-500 p-3 rounded-lg bg-green-500">
                 <div className="flex flex-row items justify-between w-full">
-                <p className="text-2xl font-bold text-white">Tier: {tier}</p>
-                <CiCirclePlus color="white" size={34}/>
+                    <p className="text-2xl font-bold text-white">Tier: {tier}</p>
+                    <div onClick={() => {
+                        setavailablebal(true)
+                    }} className="border-2 py-1 rounded-md px-3 bg-black group hover:bg-white transition hover:border-white cursor-pointer">
+                        <p className="text-sm font-bold text-white group-hover:text-black">Withdraw Funds</p>
+                    </div>
                 </div>
                 <p className="text-xl font-bold text-white">Account Balance: $ {balance}</p>
-                <p className="text-sm text-white font-bold">Available Withdrawal Balance: ${balance}</p>
+                <p className="text-sm text-white font-bold">Available Withdrawal Balance: ${balance - balance}</p>
             </div>
             <div className="mt-5 mb-5 lg:mb-0">
                 {screenSize === 'lg' ? (

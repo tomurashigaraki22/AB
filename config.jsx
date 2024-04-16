@@ -1,1 +1,1 @@
-export const BASE_TEST = 'http://192.168.43.227:5000'
+export const BASE_TEST = 'https://abs-hrq9.onrender.com'

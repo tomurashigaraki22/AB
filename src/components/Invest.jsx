@@ -50,7 +50,7 @@ const Invest = () => {
                             <p className="text-l font-bold text-white">Account Balance:</p>
                             <p className="font-bold text-white">$ {balance}</p>
                         </div>
-                        <div className="flex flex-col items-center lg:flex-row lg:flex-wrap md:justify-center">
+                        <div className="flex flex-col items-center ">
                             <p className="text-xl font-bold text-white mt-5 ">Choose A Plan</p>
                             <div onClick={() => {
                                             navigate('/pay', { state: { payment: "0.01", plan: "VIP1", user: username } });

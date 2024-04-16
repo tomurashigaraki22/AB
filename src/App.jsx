@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard'
 import Pay from './components/Pay'
 import Profile from './components/Profile'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import AdminPage from './pages/AdminPage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -29,6 +30,7 @@ function App() {
             <Route path='/dashboard' element={<Dashboard/>}/>
             <Route path='/pay' element={<Pay/>}/>
             <Route path='/profile' element={<Profile/>}/>
+            <Route path='/admin' element={<AdminPage/>}/>
           </Routes>
         </Router>
       </GoogleOAuthProvider>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { HiClipboardCopy } from "react-icons/hi";
 import Navbar from "./Navbar";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BASE_TEST } from "../../config";
 
 const Pay = () => {
@@ -11,6 +11,7 @@ const Pay = () => {
     const [copied, setCopied] = useState(false);
     const [verify, setverify] = useState(false);
     const [wrong, setwrong] = useState(false)
+    const navigate = useNavigate()
     const [screenshot, setScreenshot] = useState(null);
 
     const copyToClipboard = () => {
@@ -40,6 +41,7 @@ const Pay = () => {
                 if (resp2.status === 200){
                     console.log('Success')
                     setverify(true)
+                    navigate('/home')
                 }
                 else{
                     console.log("Failure")

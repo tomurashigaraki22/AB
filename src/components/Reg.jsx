@@ -97,24 +97,6 @@ const Reg = () => {
           <label className="mr-1">Sign up with</label>
           <button
             type="button"
-            className="mx-1 h-9 w-9  rounded-full bg-green-600 hover:bg-green-700 text-white shadow-[0_4px_9px_-4px_#3b71ca]"
-          >
-            <BiLogoFacebook
-              size={20}
-              className="flex justify-center items-center w-full"
-            />
-          </button>
-          <button
-            type="button"
-            className="inlne-block mx-1 h-9 w-9 rounded-full bg-green-600 hover:bg-green-700 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca]"
-          >
-            <AiOutlineTwitter
-              size={20}
-              className="flex justify-center items-center w-full"
-            />
-          </button>
-          <button
-            type="button"
             className="inlne-block mx-1 h-9 w-9 rounded-full bg-green-600 hover:bg-green-700 uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca]"
           >
             <AiOutlineGoogle
